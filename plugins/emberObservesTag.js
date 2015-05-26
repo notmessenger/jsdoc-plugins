@@ -39,7 +39,7 @@ exports.astNodeVisitor = {
  */
 exports.defineTags = function( dictionary ) {
     dictionary.defineTag( 'observes', {
-        mustHaveValue: true,
+        mustHaveValue: false,
         canHaveType: false,
         canHaveName: false,
         onTagged: function( doclet, tag ) {
