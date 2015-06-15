@@ -86,8 +86,6 @@ include:
 
 # emberListensTag
 
-Adds @observes tag to those DocBlocks that should have it
-
 Adds @listens tag to those DocBlocks that should have it
 
 The [Ember.js on()](http://emberjs.com/api/classes/Ember.Evented.html#method_on) method subscribes to a named event with
