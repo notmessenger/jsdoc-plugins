@@ -7,25 +7,58 @@
  */
 'use strict';
 
+var whitelist = [
+    'computed',
+    'observer',
+    'observes',
+    'property'
+];
+
+var addObservesTagToComment = function( commentBlock, augmentValues ) {
+    // Only support multi-line comment block
+    if ( new RegExp( "\n" ).test( commentBlock ) ) {
+        return commentBlock.replace(
+            /\n     \*\//g,
+            "\n     * @observes " + augmentValues.join(', ' ) + "\n     */"
+        );
+    }
+};
+
 exports.astNodeVisitor = {
     visitNode: function( node, e, parser, currentSourceName ) {
         var argumentValues = [];
 
-        if ( 'Property' === node.type && node.value.arguments ) {
+        if ( 'Property' === node.type &&
+             node.value.arguments &&
+             'Identifier' === node.value.callee.property.type
+        ) {
 
-            // Gather up each observed property
-            node.value.arguments.forEach( function( argument ) {
-                if ( 'Literal' === argument.type ) {
-                    argumentValues.push( argument.value );
-                }
-            });
+            // Process whitelist
+            if ( whitelist.indexOf( node.value.callee.property.name ) > -1 ) {
+                node.value.arguments.forEach( function( argument ) {
+                    if ( 'Literal' === argument.type ) {
+                        argumentValues.push( argument.value );
+                    }
+                });
+            }
 
-            // Only support multi-line comment block
-            if ( new RegExp( "\n" ).test( e.comment ) ) {
-                e.comment = e.comment.replace(
-                                /\n     \*\//g,
-                                "\n     * @observes " + argumentValues.join(', ' ) + "\n     */"
-                            );
+            var lastNodeValueArgumentsPosition = node.value.arguments.length-1;
+
+            // Process any Ember.* calls provided as last argument to Ember.on()
+            if ( 'on' === node.value.callee.property.name &&
+                 node.value.arguments[lastNodeValueArgumentsPosition].callee &&
+                 whitelist.indexOf( node.value.arguments[lastNodeValueArgumentsPosition].callee.property.name ) > -1
+            ) {
+                node.value.arguments[lastNodeValueArgumentsPosition].arguments.forEach( function( argument ) {
+                    if ( 'Literal' === argument.type ) {
+                        argumentValues.push( argument.value );
+                    }
+                });
+            }
+
+            // Add @observes tag to comment block
+            if ( argumentValues.length > 0 ) {
+                e.comment = addObservesTagToComment( e.comment, argumentValues );
             }
         }
     }

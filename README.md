@@ -34,7 +34,8 @@ include:
 Adds @observes tag to those DocBlocks that should have it
 
 [Ember.js Computed Properties](http://emberjs.com/api/classes/Ember.ComputedProperty.html) observe properties.
-Without needing to populate [@observes tags](https://github.com/notmessenger/jsdoc-plugins#observestag) this
+So do [Ember.js Observers](http://guides.emberjs.com/v1.10.0/object-model/observers/).  Without needing to populate
+[@observes tags](https://github.com/notmessenger/jsdoc-plugins#observestag) this
 plugin will automatically add them to the DocBlocks for you during documentation generation.
 
 This plugin supports both the prototype and non-prototype extension syntax:
@@ -46,7 +47,29 @@ fullName: function() {
 
 fullerName: Ember.computed( 'firstName', 'lastName', function() {
     ...
+}),
+
+watches: function() {
+    ...
+}.observes( 'firstName', 'lastName' ),
+
+watchesMore: Ember.observer( 'firstName', 'lastName', function() {
+    ...
 })
+```
+
+It will also respect these properties when contained within an `Ember.on()` call, such as:
+
+```
+onThenObserver: Ember.on(
+    'didInsertElement',
+    Ember.observer(
+        'propertyName',
+        function() {
+            ...
+        }
+    )
+)
 ```
 
 In order for this tag to display in the generated documentation you will need to modify the `/method.tmpl` file to
