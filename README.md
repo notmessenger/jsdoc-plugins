@@ -83,3 +83,39 @@ include:
     </ul>
 <?js } ?>
 ```
+
+# emberListensTag
+
+Adds @observes tag to those DocBlocks that should have it
+
+Adds @listens tag to those DocBlocks that should have it
+
+The [Ember.js on()](http://emberjs.com/api/classes/Ember.Evented.html#method_on) method subscribes to a named event with
+given function. Without needing to populate [@listens tags](http://usejsdoc.org/tags-listens.html) this plugin will
+automatically add them to the DocBlocks for you during documentation generation.
+
+This plugin supports both the prototype and non-prototype extension syntax:
+
+```
+initializer: function() {
+    ...
+}.on( 'property' )
+
+anotherInitalizer: Ember.on( 'property', function() {
+    ...
+})
+```
+
+It will also respect these properties when contained within an `Ember.observer()` or `Ember.computed()` calls, such as:
+
+```
+observeThenOn: Ember.observer(
+    'property',
+    Ember.on(
+        'didInsertElement',
+        function() {
+            ...
+        }
+    )
+)
+```
