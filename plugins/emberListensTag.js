@@ -29,6 +29,7 @@ exports.astNodeVisitor = {
 
         if ( 'Property' === node.type &&
              node.value.arguments &&
+             node.value.callee.property &&
              'Identifier' === node.value.callee.property.type
         ) {
             // Process whitelist
